@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import os
 import mysql.connector
+import redis
 
 app = Flask(__name__)
 
@@ -8,6 +9,8 @@ DB_HOST = os.getenv('DB_HOST','db')
 DB_USER = os.getenv('DB_USER', 'appuser')
 DB_PASSWORD = os.getenv('DB_PASSWORD','changeme')
 DB_NAME = os.getenv('DB_NAME','appdb')
+
+r = redis.Redis(host=os.environ.get("REDIS_host", "cache"), port=6379, decode_responses=True)
 
 @app.get('/api/health')
 def health():
