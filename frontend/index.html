@@ -18,270 +18,169 @@
 <body>
     <h1>Weeek 5 Assignment</h1>
     <div>
-        <h2>3-tier Application Test v 2.0</h2>
+        <h2>3-tier Application Test with Redis Cache</h2>
 
         <div class="highlight-section">
             <p>
-                <strong>Message:</strong>
-                <span id="msg">Loading...</span>
-            </p>
-            <p>
-                <strong>MySQL Database Time:</strong>
-                <span id="time">Loading time...</span>
-            </p>
-            <p>
-                <strong>Total Number of visits:</strong>
+                <strong>Total Number of visits from Database:</strong>
                 <span id="visits">Loading visits...</span>
+            </p>
+            <p>
+                <strong>Total Number of visits from Redis Cache:</strong>
+                <span id="cache_visits">Loading visits...</span>
             </p>
         </div>
 
         <h2>Documentatino of Work</h2>
-        <h2>1. Local Development Phase</h2>
-        <h3>Step1 : Creating the Project Structure</h3>
+        <h2>Part A : Answers to Questions</h2>
+        <h3>Q1 : Explain the difference between SAML and OAuth. When would a company choose one over the other?</h3>
+        <p>SAML and OAuth differ at the core: SAML is about proving who the user is, while OAuth is about controlling what an application is allowed to do. 
+            SAML provides authentication and enterprise single sign-on, typically using XML assertions passed between an identity provider and a service provider. 
+            OAuth, by contrast, provides delegated authorization — it lets a user grant a third-party app limited access to their data without sharing credentials.</p>
+        <p>In practice, companies choose between them based on the problem they're solving. 
+            When the goal is workforce login — employees accessing SaaS tools like Salesforce, Slack, or internal portals — SAML fits because it cleanly federates identity across systems and gives a seamless SSO experience. 
+            It answers the question “Who is this user?” and is widely adopted in enterprise environments. </p>
+        <p>OAuth becomes the right choice when the company needs controlled access to APIs or wants apps to act on a user's behalf. 
+            It's used when a service needs permission to read a calendar, post to a repository, or access cloud storage without ever seeing the user's password. 
+            It answers “What is this app allowed to do?” and is the backbone of modern API security. </p>
+        <p>A modern architecture often uses both: SAML for employee login, OAuth (usually with OpenID Connect added) for mobile apps, SPAs, and third-party integrations. 
+            The decision isn't about which protocol is better overall — it's about choosing the one that matches the layer of identity you're dealing with.</p>
+
+        <p>References</p>
+        <ul>
+            <li><a href="https://auth0.com/docs/authenticate/protocols/oauth">OAuth 2.0 Authorization Framework</a></li>
+            <li><a href="https://auth0.com/docs/authenticate/protocols/saml/saml-configuration">SAML Configuration</a></li>
+        </ul>
+        
+        <h3>Q2 : What are open data portals(for example avoindata.fi or the European Data Portal) and why does choosing the right open-data format matter for reuse? </h3>
+        <p>Open data portals such as avoindata.fi and the European Data Portal are public platforms that collect, catalogue, and publish machine-readable datasets produced by governments, public agencies, cities, and other organisations. 
+            They exist to make public-sector information easy to find, access, and reuse. 
+            Finland's avoindata.fi, for example, provides access to more than 2,300 datasets and offers APIs, search tools, and guidelines that help organisations publish data in a standardised way, while also ensuring the data is harvested into the wider European ecosystem.  
+            The European Data Portal plays a similar role at the EU level, offering tools for bulk download, metadata quality assessment, interoperability guidance, and training resources to help people use and publish open data effectively. </p>
+        <p>Choosing the right open-data format matters because it directly affects how easily others can reuse the data. 
+            Open data is defined as digital, machine-readable information with an open licence, meaning anyone can use it for any purpose.  
+            But “machine-readable” is not just a label — it determines whether developers, researchers, and companies can actually work with the data. 
+            A well-chosen format (such as CSV, JSON, GeoJSON, or XML) allows software tools to process the data automatically, combine it with other datasets, and build applications or visualisations without manual cleaning. 
+            Poor formats — PDFs, images, inconsistent spreadsheets — make reuse difficult or impossible because they require heavy preprocessing and often lose structure or precision.</p>
+        <p>Portals like avoindata.fi emphasise standardisation because consistent formats improve interoperability across organisations and countries, enabling cross-border collaboration and innovation.  
+            The European Data Portal reinforces this by providing guidelines and tools for metadata quality and standardised publishing, ensuring datasets can be integrated into larger systems and reused at scale. </p>
+        <p>References</p>
+        <ul>
+            <li><a href="https://avoindata.suomi.fi/en">Open Data</a></li>
+            <li><a href="https://data.europa.eu/">European Data</a></li>
+            <li><a href="https://opendatahandbook.org/guide/en/">The Open Data Handbook</a></li>
+        </ul>    
+
+        <h3>Q3 : What is YAML and why has it become the default configuration format for Kubernetes/Rahti manifests? Compare it briefly to JSON.</h3>
+        <p>YAML is a human-friendly data-serialization format designed to be easy to read and write. 
+            Its name literally means “YAML Ain't Markup Language”, which hints at its purpose: it isn't meant to describe documents like HTML or XML, but to express structured data in a way that feels natural to humans. 
+            YAML uses indentation instead of braces, supports comments, and avoids unnecessary punctuation, which makes configuration files feel more like clean, readable text rather than code.</p>
+        <p>Kubernetes (and Rahti, which is built on OpenShift/Kubernetes) adopted YAML as the default format for manifests because readability matters enormously when you're defining complex infrastructure. 
+            A Kubernetes manifest often contains nested objects, lists, metadata, and specifications for pods, deployments, services, volumes, secrets, and more. 
+            YAML's indentation-based structure makes these relationships visually clear, helping developers and operators understand the hierarchy at a glance. 
+            YAML also supports anchors, aliases, and multi-line strings, which are useful for large configurations. 
+            Most importantly, YAML is flexible enough to represent Kubernetes' declarative model: you describe the desired state, and the system reconciles it.</p>
         <p>
-           I began the assignment by creating the folder structure for the three-tier application. 
-           This created three main components: 
-           <ul>
-            <li><strong>frontend/ - Nginx static site</strong> </li>
-            <li><strong>backend/ - Flask + Gunicorn API</strong></li>
-            <li><strong>db/init/ - MySQL initialization scripts</strong></li>
-           </ul>  
-           <img src="https://a3s.fi/swift/v1/Assignment4/project structure.png" alt="project-structure"></img>      
+           JSON can represent the same data, and Kubernetes actually accepts JSON for all manifests. But JSON is more rigid and verbose. 
+           It requires braces, brackets, and quotes everywhere, and it doesn't allow comments.
+            A Kubernetes Deployment written in JSON is significantly harder to scan visually, especially when nested several levels deep. 
+           YAML's cleaner syntax reduces cognitive load and makes configuration errors easier to spot. 
+           In practice, YAML became the default because it's simply more comfortable for humans, even though Kubernetes internally converts YAML to JSON before processing it. 
+        </p>
+        <p>References</p>
+        <ul>
+            <li><a href="https://yaml.org/spec/1.2/spec.html">YAML Language Specification</a></li>
+            <li><a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/">Kubernetes Documentationa</a></li>
+        </ul>     
+        
+        <h3>Q4 : Explain what a peer-to-peer VPN(for example n2n) is used for, and how it differs from a traditional site-to-site VPN?</h3>
+        <p>A peer-to-peer VPN such as n2n creates a direct encrypted tunnel between individual devices, letting them communicate as if they were on the same local network even when they're physically far apart. 
+            Instead of routing traffic through a central gateway, each device becomes a peer in a virtual LAN. 
+            n2n uses a lightweight “supernode” only to help peers discover each other; once connected, the traffic flows directly between endpoints. 
+            This makes peer-to-peer VPNs useful for small teams, IoT deployments, ad-hoc remote access, home-lab setups, or situations where devices need to talk directly without a full corporate network behind them.</p>
+        <p>A traditional site-to-site VPN, by contrast, links entire networks together. Each site has a gateway (usually a firewall or router) that maintains a persistent tunnel to the other site. 
+            All devices behind each gateway can reach the remote network without running VPN software themselves. 
+            This model is used for branch offices, data centers, cloud VPCs, and enterprise WANs, where the goal is to merge two networks into one continuous private environment.</p>
+        <p>The difference is architectural: peer-to-peer VPNs connect hosts to hosts, while site-to-site VPNs connect network to network. 
+            Peer-to-peer tunnels are typically lightweight, flexible, and on-demand; site-to-site tunnels are persistent, infrastructure-level, and designed for large-scale routing between subnets. 
+            The choice depends on whether you need direct device-to-device communication or full network integration.</p>
+        <p>References</p>
+        <ul>
+            <li><a href="https://runbook.academy/courses/opnsense/lessons/118-remote-access-vs-site-to-site/?utm_source=copilot.com">OPNsense RunBook Academy — explanation of site-to-site VPNs as persistent tunnels between networks and remote-access/peer patterns</a></li>
+            <li><a href="https://computingforgeeks.com/remote-access-site-to-site-vpn/?utm_source=copilot.com">ComputingForGeeks — description of site-to-site VPNs linking whole networks via gateway-to-gateway tunnels</a></li>
+        </ul>     
+        
+        <h2>Part B: Implementation Evidences</h2>
+        <p>
+           This work is an extension of Assignment 4. The existing three-tier application was extended by adding a Redis cache to store the page-view counter.    
+        </p>
+        <p>
+           Week 4 Assignment URL -   <strong>https://frontend-route-three-tier-app.2.rahtiapp.fi/</strong>
         </p>
 
-        <h3>Step2 : Backend Setup</h3>
-        <p>
-           I created the backend application that exposes two endpoints: 
-           <ul>
-            <li><strong>/api/health - health check</strong> </li>
-            <li><strong>/api - returns a message from MySQL</strong></li>
-           </ul>       
-        </p>
-
-        <h3>Step3 : Frontend Setup</h3>
-        <p>
-           I created a simple HTML page that fetches /api and displays the message. Then I configured Nginx to:
-           <ul>
-            <li><strong>Serve the static frontend</strong> </li>
-            <li><strong>Proxy /api requests to the backend container at backend:8000</strong></li>
-           </ul>       
-        </p>
-
-        <h3>Step4 : Database Setup</h3>
-        <p>
-           I prepared MySQL initialization using an SQL script that:
-           <ul>
-            <li><strong>Creates database appdb</strong> </li>
-            <li><strong>Creates user appuser</strong></li>
-            <li><strong>Grants privileges</strong></li>
-           </ul>       
-        </p>
-
-        <h3>Step5 : Creating .env for Docker Compose and Create Docker Compose file</h3>
-        <p>
-           I created an .env file containing: MySQL root password, DB host, DB user, DB password, DB name. This file is used by Docker Compose to configure all services.
-           Then I created a Docker Compose file that defines: db, frontend and backend services.     
-        </p>
-
-        <h3>Step6 : Running locally</h3>
-        <p>
-           I started the full three-tier stack using: <strong>docker compose -f docker-compose.dev.yml --env-file .env up --build -d</strong>
-           Opening http://localhost:8080 looks like this.  At this point:
-            <ul>
-                <li><strong>All three containers worked together</strong> </li>
-                <li><strong>Frontend → Backend → Database communication was successful</strong></li>
-                <li><strong>The message from MySQL appeared on the frontend</strong></li>
-                <li><strong>The stack was fully functional locally</strong></li>
-           </ul> 
-           <img src="https://a3s.fi/swift/v1/Assignment4/local_deployment_using_docker.png" alt="Local Deploymente"></img>       
-        </p>
-
-        <br></br>
-        <hr></hr>
-
-        <h2>2. Deploying the Three-Tier Application to Rahti Phase</h2>
-        <p>
-           I logged into the Rahti web console using my university credentials. Then I created a new project for the assignment.
-           After completing local development and testing with Docker Compose, I created the needed yaml files to deploy application to Rahti.
-           This phase involved creating:
-            <ul>
-                <li><strong>3 Deployments - frontend, backend, database</strong> </li>
-                <li><strong>3 Services - frontend, backend, database</strong></li>
-                <li><strong>ConfigMap</strong></li>
-                <li><strong>Route</strong></li>
-                <li><strong>Secret</strong></li>
-                <li><strong>PersistentVolumeClaim (PVC) for MySQL</strong></li>
-           </ul> 
-           All resources were applied through the Rahti web console using the “Import YAML” feature.     
-        </p>
-
-        <h3>Short Description of My Application</h3>
-        <p>
-          My application is a three-tier web system consisting of a frontend (Nginx), a backend API (Flask + Gunicorn), and a MySQL database. 
-          When the user opens the frontend page, the browser sends a request to the backend's /api endpoint. 
-          The backend connects to the MySQL database, reads a greeting message, inserts a new visitor record, retrieves the total visitor count, and fetches the current database time. 
-          It then returns all this information as JSON. 
-          The frontend displays the message, the database time, and the visitor count, demonstrating full communication between all three tiers and confirming that the database persists data across requests and pod restarts.
-        </p>
-
-        <h3>Architecture of My Application</h3>
-        <img src="https://a3s.fi/swift/v1/Assignment4/architecture_diagram.png" alt="Rahti Deploymentr"></img>
-
-        <h3>Rahti Project Area</h3>
-        <img src="https://a3s.fi/swift/v1/Assignment4/rahati_project _area.png" alt="Rahti Deploymentr"></img>
+        <h3>Updated Application Overview and Application Architecture</h3>
+        <p>The architecture from Assignment 4 was extended by adding a Redis cache to the application. 
+            The original frontend, backend, and MySQL database remain in place, while Redis is now used by the backend to store the page-view counter.</p>
+        <p>Redis is therefore not part of the backend pod. It operates independently alongside the existing Week 4 pods and communicates with the backend through the OpenShift internal network. 
+            This demonstrates how an additional containerized caching service can be integrated into the existing application without modifying the original frontend, backend, and database structure.</p>
 
         <h3>OC commands</h3>
         <p>Following screenshot shows the created deployments, services, pvcs etc in the rahti project</p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/oc_cmd.png" alt="Rahti Deploymentr"></img>
+        <p>Redis runs independently from the backend as its own pod.
+        The backend communicates with the Redis pod through the OpenShift cache service on port 6379.
+        </p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/oc_cmds.png" alt="oc_commands"></img>
 
-        <h3>Evidence That Frontend → Backend → Database Communication Works</h3>
-        <img src="https://a3s.fi/swift/v1/Assignment4/deployment.png" alt="Rahti Deploymentr"></img>
+        <h3>Cache api verification</h3>
         <p>
-          I opened the frontend route: https://frontend-route-three-tier-app.2.rahtiapp.fi/
-          The frontend displays as above. This proves: Frontend → Backend communication works, Backend → Database communication works, The Nginx proxy configuration is correct, The API call from JavaScript succeeded  
-           <strong>Hello from MYSQL via Flask!</strong> This message does NOT come from the frontend.It is generated by the backend using this SQL query. 
-           This proves The frontend JavaScript fetch() request reached the backend. 
-           The backend Flask API responded correctly.The Nginx proxy forwarded /api to the backend service.
-           The backend only returns this message after connecting to MySQL and executing the SQL query.
-           The next line server time also displayed from server.
-           This is example of <strong>READ operation</strong>
-           The final evidence is the frontend displays visit counter from database.
-           This is the visit count stored in MySQL.
-           Everytime frontend loads it inserts a new row into the counter table. Then returns the count to the frontend.
-           This is example of <strong>WRITE operation</strong>
+          The screenshot verifies the functionality of the /api/visits API endpoint. 
+          It shows the visit counter increasing with each request, confirming that the counter is being updated by the Redis cache. 
+          This demonstrates that the backend is successfully communicating with the standalone Redis service and using Redis to store the counter value in memory.
         </p>
 
-        <h3>Evidence That Database Persistence Works</h3>
-        <p>
-          When visit public url, counter increases over time. This proves: Data is stored in MySQL. Data is not lost between requests
-          After restarting the backend pod:The visit count remained the same. The next visit increased the number to next number.
-          This proves: Backend is stateless Database is persistent
-          Restarting database pod does NOT reset the counter
-          I restarted the MySQL pod in Rahti.
-          After restart: The counter table still contained all previous rows The visit count continued increasing normally
-          This proves: The PersistentVolumeClaim (PVC) is working MySQL data survives pod restarts Database persistence is correctly configured
-        </p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/cache_api.png" alt="api_verification"></img>
 
-        <h3>ConfigMaps and Secrets for Container Configuration</h3>
-        <p>
-          In Kubernetes, both ConfigMaps and Secrets are used to provide configuration data to containers, but they serve different purposes. 
-          A ConfigMap stores non-sensitive configuration values such as database hostnames, usernames, and application settings. 
-          These values are injected into containers as environment variables or mounted as configuration files, allowing the application to read them at runtime without hard-coding them into the image. 
-          In contrast, a Secret is designed specifically for sensitive information like passwords, API keys, and tokens. Secrets are stored in a protected, base64-encoded format and are only accessible to authorized pods. 
-          In my application, the backend deployment uses a ConfigMap to receive safe configuration values such as DB_HOST, DB_NAME, and DB_USER, while a Secret provides the sensitive DB_PASSWORD and MYSQL_ROOT_PASSWORD. 
-          This separation ensures that containers receive all necessary configuration while keeping confidential data secure and following Kubernetes best practices.
-        </p>
+        <h2>Experiments</h2>
+        <h3>1. Delete the Redis Cache Pod</h3>
+        <p>The Redis cache pod was deleted from the OpenShift project to observe how the application behaves when the cache pod is removed.</p>
+        <p>After deleting the cache pod, OpenShift automatically recreated the pod because the Redis deployment was configured to maintain the desired number of replicas.</p>
+        <p>I also checked the visit count before and after deleting the Redis pod. After the Redis pod was recreated, the visit count started again from 1. This happened because the page_views counter was stored in Redis, and the new Redis pod did not retain the previous counter value.</p>
+        <p>This experiment demonstrated that the visit counter stored in Redis is temporary and can be lost when the Redis pod is recreated if persistent storage is not configured for Redis.</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp3.png" alt="api_verification"></img>
+        <p>Before Deleting pod</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp1.png" alt="api_verification"></img>
+        <p>After Deleting pod</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp2.png" alt="api_verification"></img>
 
-        <h3>Database Persistence in Rahti</h3>
-        <p>
-          In this application, the MySQL database must use persistent storage so that data is not lost when containers restart. 
-          In Rahti, I created a PersistentVolumeClaim (PVC) and attached it to the MySQL deployment, ensuring that all database files under /var/lib/mysql are stored on Rahti's persistent storage backend rather than inside the pod's ephemeral filesystem. 
-          To verify persistence experimentally, I inserted several rows into the counter table through the backend API and confirmed the visitor count increased. 
-          Then I manually deleted the MySQL pod from the Rahti console. When Rahti automatically recreated the pod, I connected to the database again and checked the counter table; all previously stored rows were still present. 
-          This demonstrated that the data survived pod replacement and that the PVC was functioning correctly. 
-          Persistence in Rahti differs from the Docker volume used in earlier exercises because Docker volumes store data locally on the developer's machine, while Rahti PVCs store data on a network-backed persistent storage system managed by the cluster. 
-          This means data in Rahti remains intact even if pods are rescheduled to different nodes, whereas Docker volumes only persist as long as the local Docker environment remains unchanged.        
-        </p>
 
-        <h3>Comparison of Rahti and cPouta</h3>
-        <p>
-          Rahti and cPouta are both cloud services provided by CSC, but they serve different purposes and operate at different abstraction levels. 
-          cPouta is an Infrastructure-as-a-Service (IaaS) platform where the user manages virtual machines directly. 
-          In cPouta, you are responsible for installing and configuring everything yourself, including the operating system, web server, security updates, networking rules, and storage. 
-          This gives full control but also requires more manual work. In contrast, Rahti is a Platform-as-a-Service (PaaS) environment built on Kubernetes/OpenShift. 
-          Instead of managing virtual machines, you deploy container images, and Rahti automatically handles scheduling, scaling, networking, routing, health checks, and persistent storage. 
-          Rahti uses Deployments, Services, Routes, Secrets, and ConfigMaps to manage applications declaratively, while cPouta requires manual configuration through SSH and system administration. 
-          In summary, cPouta gives raw infrastructure control, while Rahti provides a higher-level, automated platform for running containerized applications with less operational overhead.
-        </p>
+        <h3>2. Delete the Database Pod</h3>
+        <p>The MySQL database pod was deleted to test the application's behavior when the database pod is removed.</p>
+        <p>OpenShift automatically recreated the database pod according to its deployment configuration.</p>
+        <p>After the database pod was recreated, I checked the visit count. The application continued from the value that was already saved in the database table rather than starting from 1.</p>
+        <p>This demonstrated the difference between the Redis cache and the MySQL database. The database data was preserved because it was stored in persistent storage, while the Redis counter was reset when the Redis pod was recreated.</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp4.png" alt="api_verification"></img>
+        <p>Before Deleting pod</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp5.png" alt="api_verification"></img>
+        <p>After Deleting pod</p>
+        <img src="https://a3s.fi/swift/v1/Assignment5/exp6.png" alt="api_verification"></img>
 
-        <h3>Container Orchestration Experiments</h3>
-        <h4>1. Pod Recovery Experiment</h4>
-        <p>
-            This experiment is to verify that Rahti automatically recreates pods when one is deleted, demonstrating container orchestration and self-healing behavior.
-            Open Rahti → Workloads → Pods and locate the backend pod.
-            This is a screenshot before deletion, showing the running backend pod.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/before_delete_pods.png" alt="before delete pods"></img>
-
-        <p>
-            Then I deleted the backend pod manually. Observe Rahti automatically creating a new pod with a different name.
-            This is the screenshots during recreation, showing the new pod being created.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/creating_pods.png" alt="creating pods"></img>
-
-        <p>
-            Wait until the new pod status changes to Running.Take a screenshot after recovery, showing the new pod fully running.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/after_delete_pods.png" alt="after delete pods"></img>
-
-        <p>
-            Rahti uses a Deployment controller that defines the desired number of replicas.
-            When a pod is deleted, Kubernetes detects that the actual number of pods is less than desired and automatically creates a replacement.
-            This behavior proves self-healing — Rahti maintains the desired state of the application without manual intervention.
-        </p>
-
-        <h4>2. Scaling Experiment</h4>
-        <p>
-            I opened Rahti → Workloads → Deployments and selected my backend deployment.
-            In the deployment settings, I changed the number of replicas from 1 to 3.
-            I refreshed the frontend several times to confirm the application still worked.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/before_experiment.png" alt="before experiment"></img>
-        <img src="https://a3s.fi/swift/v1/Assignment4/1pod.png" alt="1 pod"></img>
-
-        <p>
-            Rahti created new pods automatically as soon as I increased the replica count.
-            The new pods had different names but identical configuration.
-            The frontend continued working normally — no downtime.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/scale_to_3.png" alt="after scale to 3 pods"></img>
-
-        <p>
-            In Rahti, the frontend does not need to know the IP addresses of individual backend pods because Kubernetes provides a stable communication layer through a Service. 
-            Each backend pod receives its own internal IP address, but these IPs change whenever pods are restarted, scaled, or replaced. 
-            Instead of connecting directly to pod IPs, the frontend sends its requests to the backend Service, which has a permanent virtual IP and DNS name.
-            The Service automatically discovers all backend pods using label selectors and forwards incoming requests to whichever pods are currently running. 
-            This means the frontend always communicates with a single, stable endpoint, while Kubernetes handles load balancing and routing behind the scenes. 
-            As a result, the application continues working even when pods are deleted, recreated, or scaled, demonstrating how container orchestration abstracts away pod-level networking details.
-        </p>
-
-        <h4>3. Application Update Experiment</h4>
-
-        <p>
-            I made a small change to my backend application.
-            I rebuilt the Docker image locally and pushed the new version to Docker Hub with a new tag.
-            In Rahti, I opened Workloads → Deployments → backend.
-            I edited the deployment and changed the container image from the old tag to the new one.
-            After saving, Rahti automatically started a rolling update:
-            New pods began appearing with the updated image.
-            Old pods started terminating one by one.
-            I waited until all new pods reached Running state.
-            I refreshed the frontend route to confirm the updated backend behavior.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/old_image.png" alt="old image"></img>
-        <img src="https://a3s.fi/swift/v1/Assignment4/old_deployment.png" alt="old deployment"></img>
-        <p>
-            Rahti immediately pulled the new image tag and created new backend pods.
-            The old pods did not disappear instantly — Rahti replaced them gradually.
-            During the update, the application stayed online with no downtime.
-            Once the rollout finished, only the new pods were running.
-            The frontend showed the updated backend output.
-            This confirmed that Rahti handles updates automatically and safely without breaking the application.
-        </p>
-        <img src="https://a3s.fi/swift/v1/Assignment4/new_image.png" alt="new image"></img>
-        <img src="https://a3s.fi/swift/v1/Assignment4/updated_deployment.png" alt="updated deployment"></img>
 
         <h3>Most Important Problem Encountered and How I Solved It</h3>
-        <p>
-          The most significant problem I encountered during the project was that the backend could not connect to the MySQL database after deploying the application to Rahti. 
-          The frontend loaded correctly, but the backend API returned errors, and the visitor counter did not update. 
-          After investigating the backend logs, I discovered that the database hostname and credentials were not being passed correctly to the backend container. 
-          In Rahti, environment variables must be provided through ConfigMaps and Secrets, and the backend deployment must explicitly reference them.
-          I solved the issue by creating a Secret for the database password and a ConfigMap for the non-sensitive settings, then updating the backend Deployment YAML to include these values under the env: section.
-          Once the deployment was redeployed with the correct environment variables, the backend successfully connected to MySQL, the /api endpoint returned the expected JSON, and the visitor counter began increasing normally. 
-          This confirmed that the configuration was correct and that all three tiers were communicating properly.       
+        <p>The most important problem encountered during the Redis integration was a 500 Internal Server Error when accessing the /api/visits endpoint. 
+            The backend logs showed that Redis had disabled write operations because it was unable to save its RDB snapshot to the /data directory. 
+            The Redis logs reported a permission error when trying to create the temporary RDB file.
         </p>
+        <p>
+            To solve the problem, I updated the Redis Deployment YAML to disable RDB snapshot saving:
+            <strong>command: ["redis-server"] args: ["--save", ""]</strong>
+        </p>
+        <p>
+            With RDB snapshot saving disabled, Redis no longer attempts to create the RDB files that were causing the permission error. 
+            After redeploying the Redis pod with this configuration, the backend was able to increment the Redis counter successfully.
 
+            I verified the solution through the /api/visits endpoint, where the visit counter increased with each request. 
+            This confirmed that the backend was successfully communicating with the standalone Redis pod and that Redis was correctly handling the in-memory counter.
+        </p>
     </div>
 
     <script>  
@@ -291,12 +190,21 @@
                     if (data.error) {
                         document.getElementById("msg").innerText = "Error from backend api: " + data.error;
                     } else {
-                        document.getElementById("msg").innerText = data.message;
-                        document.getElementById("time").innerText = data.db_time;
-                        document.getElementById("visits").innerText = "No of visits: " + data.visitor_count;
+                        document.getElementById("visits").innerText = data.visitor_count;
                     }
                 })
                 .catch((error) => console.error("Error fetching data:", error));
+
+        fetch("/api/visits")
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    document.getElementById("msg").innerText = "Error from visits api: " + data.error;
+                } else {
+                    document.getElementById("cache_visits").innerText = data.visits;
+                }
+            })
+            .catch((error) => console.error("Error fetching /api/visits:", error));
     </script>
     
 </body>

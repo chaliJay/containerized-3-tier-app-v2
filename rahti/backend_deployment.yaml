@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: chalijay/lempbackend:1.0.6
+          image: chalijay/lempbackend:1.1.3
           ports:
             - containerPort: 8000
           env:
@@ -40,3 +40,5 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: DB_PASSWORD
+            - name: REDIS_HOST
+              value: "cache"

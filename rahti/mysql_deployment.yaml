@@ -12,9 +12,18 @@ spec:
       labels:
         app: db
     spec:
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-data
       containers:
         - name: mysql
           image: mysql:8.4
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+              - name: mysql-storage
+                mountPath: /var/lib/mysql
           env:
             - name: MYSQL_DATABASE
               valueFrom:
@@ -36,12 +45,4 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: MYSQL_ROOT_PASSWORD
-          ports:
-            - containerPort: 3306
-      volumeMounts:
-        - name: mysql-storage
-          mountPath: /var/lib/mysql
-  volumes:
-    - name: mysql-storage
-      persistentVolumeClaim:
-        claimName: mysql-data
+   

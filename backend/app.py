@@ -10,11 +10,16 @@ DB_USER = os.getenv('DB_USER', 'appuser')
 DB_PASSWORD = os.getenv('DB_PASSWORD','changeme')
 DB_NAME = os.getenv('DB_NAME','appdb')
 
-r = redis.Redis(host=os.environ.get("REDIS_host", "cache"), port=6379, decode_responses=True)
+r = redis.Redis(host=os.environ.get("REDIS_HOST", "cache"), port=6379, decode_responses=True)
 
 @app.get('/api/health')
 def health():
       return jsonify(status='ok')
+
+@app.get('/api/visits')
+def visits():
+    count = r.incr('page_views')
+    return jsonify(visits=count)
 
 @app.route('/api')
 def index():
